@@ -1,0 +1,6 @@
+data/
+logs/
+models/*.bin
+*.wav
+.DS_Store
+config.env

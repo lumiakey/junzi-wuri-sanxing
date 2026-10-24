@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1080px; height:1920px; overflow:hidden; }
+  body {
+    font-family:-apple-system,"PingFang SC","Hiragino Sans GB",sans-serif;
+    background:linear-gradient(168deg,#0b1026 0%,#131c3f 42%,#231a4d 78%,#2c1650 100%);
+    color:#eef1ff; padding:60px 56px; position:relative;
+  }
+  .glow { position:absolute; border-radius:50%; filter:blur(150px); opacity:.3; pointer-events:none; }
+  .g1 { width:560px; height:560px; background:#3b82f6; top:-220px; right:-160px; }
+  .g2 { width:520px; height:520px; background:#a855f7; bottom:-240px; left:-150px; opacity:.25; }
+  .wrap { position:relative; z-index:2; height:100%; display:flex; flex-direction:column; }
+
+  .badge { display:inline-flex; gap:10px; background:rgba(240,171,252,.12);
+    border:1px solid rgba(240,171,252,.4); color:#f0abfc; font-size:24px; font-weight:600;
+    padding:10px 24px; border-radius:999px; letter-spacing:2px; align-self:flex-start; }
+  h1 { font-size:50px; font-weight:800; margin-top:22px; line-height:1.32; }
+  .grad { background:linear-gradient(90deg,#7dd3fc,#c4b5fd 55%,#f0abfc);
+    -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { font-size:25px; color:#aab3d6; margin-top:12px; line-height:1.5; }
+
+  .cmp { margin-top:26px; display:flex; flex-direction:column; gap:14px; }
+  .row { background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.11);
+    border-radius:20px; padding:18px 24px; }
+  .rt { display:flex; justify-content:space-between; align-items:baseline; }
+  .nm { font-size:26px; font-weight:800; }
+  .fee { font-size:21px; font-weight:700; color:#fbbf24; }
+  .ds { font-size:19.5px; color:#9aa4c9; margin-top:4px; }
+  .pills { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+  .pill { font-size:19px; font-weight:600; padding:6px 14px; border-radius:999px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14); color:#b9c1e0; }
+  .pill.g { color:#86efac; border-color:rgba(134,239,172,.4); }
+  .pill.r { color:#8b94b8; }
+
+  .me { background:linear-gradient(120deg,rgba(56,189,248,.2),rgba(232,121,249,.18));
+    border:1px solid rgba(196,181,253,.55); }
+  .me .nm { color:#fff; font-size:28px; }
+  .me .fee { color:#86efac; }
+
+  .sc-title { margin-top:30px; font-size:27px; font-weight:800; color:#93c5fd; }
+  .sc { display:flex; gap:16px; align-items:flex-start; margin-top:14px;
+    background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.11);
+    border-radius:20px; padding:18px 22px; }
+  .sc .si { font-size:38px; }
+  .sc .st { font-size:24px; font-weight:800; color:#e9d5ff; }
+  .sc .sd { font-size:21.5px; color:#c3caea; margin-top:6px; line-height:1.55; }
+  .sc .sd b { color:#f0abfc; }
+  .sc .sd i { font-style:normal; color:#86efac; font-weight:700; }
+
+  .kick { margin-top:auto; background:rgba(255,255,255,.04); border-left:4px solid #f0abfc;
+    border-radius:12px; padding:16px 20px; font-size:21.5px; color:#d6dcf5; line-height:1.6; }
+  .kick b { color:#f0abfc; }
+  .chips { display:flex; gap:13px; margin-top:18px; flex-wrap:wrap; }
+  .chip { font-size:22px; font-weight:600; color:#cde6ff; background:rgba(59,130,246,.16);
+    border:1px solid rgba(59,130,246,.45); padding:11px 22px; border-radius:999px; }
+</style>
+</head>
+<body>
+  <div class="glow g1"></div><div class="glow g2"></div>
+  <div class="wrap">
+    <span class="badge">📊 全天候录音方案 · 横向盘点</span>
+    <h1>实时回放、Auday、语音日记都火了一遍<br><span class="grad">把"录"变成"行动"的只有这套</span></h1>
+    <div class="sub">它们晚上给你一份"记录"，这套给你一份数字化的"三省"</div>
+
+    <div class="cmp">
+      <div class="row">
+        <div class="rt"><span class="nm">⌚ Apple Watch 实时回放 + Siri 回顾</span><span class="fee">换新表 ¥3k+</span></div>
+        <div class="ds">watchOS 26 · Series 12 / Ultra 4 官方新功能 · 2026.9 上线</div>
+        <div class="pills"><span class="pill g">全天候 ✅</span><span class="pill g">回顾 · 仅15秒/要点</span><span class="pill r">待办闹钟 ✖</span><span class="pill g">本地 ✅</span></div>
+      </div>
+      <div class="row">
+        <div class="rt"><span class="nm">🎧 Auday</span><span class="fee">订阅制</span></div>
+        <div class="ds">把 Watch 变成全天候 AI 录音助手 · 融合健康/压力信号</div>
+        <div class="pills"><span class="pill g">全天候 ✅</span><span class="pill g">日记+洞察</span><span class="pill r">待办闹钟 ✖</span><span class="pill g">多为本地</span></div>
+      </div>
+      <div class="row">
+        <div class="rt"><span class="nm">🗣️ 低语 / Aecho 爱记</span><span class="fee">订阅制</span></div>
+        <div class="ds">AI 语音日记 · 得主动开口对它说，不是被动全天候</div>
+        <div class="pills"><span class="pill r">手动记录</span><span class="pill g">AI 日记</span><span class="pill r">待办闹钟 ✖</span><span class="pill r">云端</span></div>
+      </div>
+      <div class="row">
+        <div class="rt"><span class="nm">梨 讯飞听见 / 通义听悟</span><span class="fee">按时长</span></div>
+        <div class="ds">录音转写 + 纪要 · 会议场景为主 · 音频需上云</div>
+        <div class="pills"><span class="pill r">手动上传</span><span class="pill g">转写纪要</span><span class="pill r">待办闹钟 ✖</span><span class="pill r">音频上云</span></div>
+      </div>
+      <div class="row me">
+        <div class="rt"><span class="nm">🔁 本方案（开源自建）</span><span class="fee">¥0 / 月</span></div>
+        <div class="ds">快捷指令自动触发 + 本地转写 + LLM 分析 + 苹果四件套联动</div>
+        <div class="pills"><span class="pill g">全天候 ✅</span><span class="pill g">三省日报</span><span class="pill g">待办+闹钟 ✅</span><span class="pill g">音频永本机</span></div>
+      </div>
+    </div>
+
+    <div class="sc-title">🪞 灵魂使用场景（真实到疼）</div>
+    <div class="sc"><div class="si">💼</div><div>
+      <div class="st">职场：别对闹钟说谎</div>
+      <div class="sd">周会上拍胸脯<b>"今晚就改好"</b>——次日 9:00 闹钟准时讨债，日报批注：<i>为人谋而不忠乎？</i></div>
+    </div></div>
+    <div class="sc"><div class="si">🍲</div><div>
+      <div class="st">生活："下次我请"清算日</div>
+      <div class="sd">本月说了 <b>6 次"下次我请"</b>，台账一笔不落；朋友翻到你的承诺台账：好家伙，欠我四顿火锅</div>
+    </div></div>
+    <div class="sc"><div class="si">💘</div><div>
+      <div class="st">爱情：AI 替对象记仇</div>
+      <div class="sd">对象问"游戏和我谁重要"，日报显示你这周说了 <b>11 次"马上就好"</b>——<i>与朋友交而不信乎？</i></div>
+    </div></div>
+
+    <div class="kick">苹果给"实时回放"加了<b>强制提示音</b>——隐私有多敏感，人人都清楚。
+    所以这套第一原则：<b>声音永远不出 Mac，出网的只有文字稿</b>。</div>
+    <div class="chips">
+      <span class="chip">💸 ¥0 / 月</span>
+      <span class="chip">🍎 原生四件套</span>
+      <span class="chip">🔓 已开源</span>
+    </div>
+  </div>
+</body>
+</html>
