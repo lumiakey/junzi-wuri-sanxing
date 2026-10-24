@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1080px; height:1920px; overflow:hidden; }
+  body {
+    font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Apple Color Emoji",sans-serif;
+    background:
+      radial-gradient(700px 460px at 100% 0%, rgba(0,122,255,.10), transparent 62%),
+      radial-gradient(640px 420px at 0% 22%, rgba(255,149,0,.09), transparent 60%),
+      linear-gradient(180deg,#FCFBF8 0%,#F3F2EE 62%,#EDEBE4 100%);
+    color:#0B1220; padding:64px 62px 54px; position:relative;
+  }
+  .wrap { position:relative; z-index:2; height:100%; display:flex; flex-direction:column; }
+
+  .badge { display:inline-flex; align-items:center; gap:10px; background:#0B1220; color:#fff;
+    font-size:23px; font-weight:800; padding:12px 26px; border-radius:999px; letter-spacing:1.5px;
+    align-self:flex-start; box-shadow:0 12px 26px -14px rgba(11,18,32,.7); }
+
+  h1 { font-size:84px; font-weight:900; line-height:1.16; letter-spacing:1px; margin-top:28px; color:#0B1220; }
+  h1 .hl { background:linear-gradient(96deg,#007AFF,#5E5CE6 62%,#AF52DE);
+    -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { font-size:27px; line-height:1.58; color:#5B6478; margin-top:16px; font-weight:500; }
+  .sub b { color:#0B1220; font-weight:800; }
+
+  .prereq { margin-top:20px; display:flex; gap:14px; align-items:flex-start;
+    background:rgba(0,122,255,.07); border:1px solid rgba(0,122,255,.22); border-radius:20px; padding:15px 22px; }
+  .prereq .pi { font-size:26px; line-height:1.2; }
+  .prereq .pt { font-size:23px; line-height:1.55; color:#31405C; font-weight:600; }
+  .prereq .pt b { color:#007AFF; font-weight:800; }
+
+  .steps { margin-top:20px; display:flex; flex-direction:column; gap:15px; }
+  .step { background:#FFFFFF; border:1px solid #E7E4DC; border-radius:26px; padding:21px 28px 19px;
+    box-shadow:0 20px 40px -30px rgba(16,24,40,.55); position:relative; }
+  .sh { display:flex; align-items:center; gap:16px; }
+  .sn { flex:0 0 56px; height:56px; border-radius:18px; background:#0B1220; color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:900; }
+  .stt { font-size:34px; font-weight:900; letter-spacing:.5px; }
+  .stt em { font-style:normal; font-size:22px; font-weight:800; color:#FF9500; margin-left:12px; }
+  .path { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin-top:14px; }
+  .pc { font-size:21px; font-weight:700; color:#33415C; background:#F4F5F8; border:1px solid #E2E5EC;
+    padding:8px 15px; border-radius:12px; }
+  .pc.key { color:#fff; background:#007AFF; border-color:#007AFF; }
+  .pc.go { color:#0B1220; background:#FFE9C7; border-color:#FFD08A; }
+  .pa { color:#AEB6C6; font-size:20px; font-weight:800; }
+  .note { font-size:22px; line-height:1.52; color:#5B6478; margin-top:11px; font-weight:600; }
+  .note b { color:#0B1220; font-weight:800; }
+  .note code { font-family:"SF Mono",Menlo,monospace; font-size:21px; background:#F1F3F7; color:#33415C;
+    padding:2px 8px; border-radius:7px; }
+  .tip { display:flex; gap:10px; margin-top:9px; font-size:20px; line-height:1.5; color:#8A6A20; font-weight:700; }
+  .tip .ti { flex:0 0 auto; }
+
+  .warn { margin-top:15px; background:#FFFFFF; border:1px dashed #D9D5C9; border-radius:20px; padding:16px 22px; }
+  .warn .wt { font-size:22px; font-weight:900; color:#B4530A; letter-spacing:1px; }
+  .warn ul { margin:10px 0 0 0; list-style:none; }
+  .warn li { font-size:20px; line-height:1.55; color:#5B6478; font-weight:600; padding-left:26px; position:relative; }
+  .warn li::before { content:"·"; position:absolute; left:8px; color:#C9C4B6; font-weight:900; }
+
+  .mac { margin-top:15px; background:#0B1220; border-radius:20px; padding:16px 22px; }
+  .mac .mh { font-size:21px; font-weight:800; color:#93A3C4; letter-spacing:1px; }
+  .mac .mcmd { font-family:"SF Mono",Menlo,monospace; font-size:22px; color:#7DD3FC; margin-top:9px; font-weight:600; }
+  .mac .mcmd em { font-style:normal; color:#6B7796; }
+  .mac .mn { font-size:20px; color:#A9B4CD; margin-top:8px; font-weight:600; }
+  .mac .mn b { color:#FDE68A; font-weight:800; }
+
+  .foot { margin-top:auto; display:flex; align-items:center; justify-content:space-between; }
+  .chips { display:flex; gap:10px; }
+  .chip { font-size:20px; font-weight:800; color:#33415C; background:#fff; border:1px solid #E2E5EC;
+    padding:10px 18px; border-radius:999px; }
+  .chip.b { color:#007AFF; border-color:rgba(0,122,255,.35); background:rgba(0,122,255,.06); }
+  .repo { font-size:18px; color:#9AA2B1; font-weight:700; text-align:right; line-height:1.5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="badge">iPhone 侧 · 3 步配好</span>
+
+  <h1>敲两下手机背面<br><span class="hl">它就自己开始录</span></h1>
+  <p class="sub">配一次，往后<b>全自动</b> —— 录完揣兜里，锁屏也不断。<br>
+  不用装任何 App，全靠系统自带。</p>
+
+  <div class="prereq">
+    <span class="pi">✅</span>
+    <span class="pt">动手前先确认：<b>设置 → 你的 Apple ID → iCloud → 语音备忘录</b> 已打开同步，
+    否则 Mac 收不到录音。</span>
+  </div>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="sh"><span class="sn">1</span><span class="stt">先建一个快捷指令<em>30 秒</em></span></div>
+      <div class="path">
+        <span class="pc">快捷指令</span><span class="pa">›</span>
+        <span class="pc">右上角 ＋</span><span class="pa">›</span>
+        <span class="pc">添加操作</span><span class="pa">›</span>
+        <span class="pc key">搜「语音备忘录」</span><span class="pa">›</span>
+        <span class="pc go">选「创建录音」</span>
+      </div>
+      <div class="note">存成 <code>三省 · 开始录音</code>，名字随便起，下一步要选它。</div>
+      <div class="tip"><span class="ti">💡</span><span>有的系统版本里这个操作叫「录制音频」，效果一样。</span></div>
+    </div>
+
+    <div class="step">
+      <div class="sh"><span class="sn">2</span><span class="stt">把「轻点背面」接上<em>敲两下就录</em></span></div>
+      <div class="path">
+        <span class="pc">设置</span><span class="pa">›</span>
+        <span class="pc">辅助功能</span><span class="pa">›</span>
+        <span class="pc">触控</span><span class="pa">›</span>
+        <span class="pc key">轻点背面</span><span class="pa">›</span>
+        <span class="pc">轻点两下</span><span class="pa">›</span>
+        <span class="pc go">选上一步那个指令</span>
+      </div>
+      <div class="note">之后掏出手机<b>敲两下背面</b>，录音就开始，屏幕都不用点亮。</div>
+      <div class="tip"><span class="ti">💡</span><span>「轻点三下」可以再绑一个停止录音，一对儿用。</span></div>
+    </div>
+
+    <div class="step">
+      <div class="sh"><span class="sn">3</span><span class="stt">加自动化<em>让它不用你动手</em></span></div>
+      <div class="path">
+        <span class="pc">快捷指令</span><span class="pa">›</span>
+        <span class="pc">自动化</span><span class="pa">›</span>
+        <span class="pc">＋</span><span class="pa">›</span>
+        <span class="pc key">到达 / Wi-Fi / 时间</span><span class="pa">›</span>
+        <span class="pc">添加「创建录音」</span><span class="pa">›</span>
+        <span class="pc go">关闭「运行前询问」</span>
+      </div>
+      <div class="note">推荐三条一起开：<b>到公司连上 Wi-Fi 开录</b>、<b>到家自动停</b>、<b>敲背面手动补录</b>。</div>
+      <div class="tip"><span class="ti">💡</span><span>新系统里这个开关叫「立即运行」，一样要关掉询问。</span></div>
+    </div>
+
+  </div>
+
+  <div class="warn">
+    <div class="wt">⚠️ 三个坑，提前说</div>
+    <ul>
+      <li>iPhone 和 Mac 必须登录<b>同一个 Apple ID</b>，且都开着语音备忘录同步。</li>
+      <li>录音时手机会显示状态条，<b>锁屏不影响录制</b>，别去点停止。</li>
+      <li>录音涉及他人请遵守当地法律，涉密场合别录。</li>
+    </ul>
+  </div>
+
+  <div class="mac">
+    <div class="mh">🍎 Mac 侧只要一条命令</div>
+    <div class="mcmd">git clone … &amp;&amp; bash setup.sh <em># 每晚 23:30 自动跑</em></div>
+    <div class="mn">手机只负责录，<b>转写和 AI 分析全在你 Mac 本地完成</b>，音频不上传。</div>
+  </div>
+
+  <div class="foot">
+    <div class="chips">
+      <span class="chip b">🔁 录完不用管</span>
+      <span class="chip">🍎 系统自带</span>
+      <span class="chip">🌙 Mac 每晚自动处理</span>
+    </div>
+    <div class="repo">github.com/lumiakey<br>junzi-wuri-sanxing</div>
+  </div>
+
+</div>
+</body>
+</html>

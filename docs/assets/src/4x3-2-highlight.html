@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1600px; height:1200px; overflow:hidden; }
+  body {
+    font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Apple Color Emoji",sans-serif;
+    background:
+      radial-gradient(880px 580px at 96% 2%, rgba(56,189,248,.20), transparent 60%),
+      radial-gradient(760px 600px at 0% 34%, rgba(168,85,247,.22), transparent 62%),
+      radial-gradient(1000px 640px at 62% 108%, rgba(232,121,249,.16), transparent 62%),
+      linear-gradient(196deg,#070A18 0%,#0E1430 40%,#191243 74%,#23124A 100%);
+    color:#EEF1FF; padding:56px 70px 48px; position:relative;
+  }
+  .wrap { position:relative; z-index:2; height:100%; display:flex; flex-direction:column; }
+
+  .badge { display:inline-flex; align-items:center; gap:10px; background:rgba(253,230,138,.1);
+    border:1px solid rgba(253,230,138,.34); color:#FDE68A; font-size:22px; font-weight:800;
+    padding:10px 24px; border-radius:999px; letter-spacing:1.5px; align-self:flex-start; }
+
+  h1 { font-size:76px; font-weight:900; line-height:1.18; letter-spacing:1px; margin-top:24px; }
+  .grad { background:linear-gradient(96deg,#FDE68A 0%,#F0ABFC 48%,#A78BFA 96%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { font-size:26px; line-height:1.5; color:#AEB7D8; margin-top:14px; }
+  .sub b { color:#FDE68A; font-weight:800; }
+  .sub i { font-style:normal; color:#E9D5FF; font-weight:700; }
+
+  .label { display:flex; align-items:center; gap:14px; margin:32px 0 15px; }
+  .label .ln { flex:1; height:1px; background:linear-gradient(90deg,rgba(255,255,255,.2),transparent); }
+  .label .tx { font-size:21px; font-weight:800; color:#93A0C8; letter-spacing:2px; }
+
+  .cols { display:flex; gap:26px; }
+  .col { flex:1; display:flex; flex-direction:column; }
+
+  .cards { display:flex; flex-direction:column; gap:16px; }
+  .card { display:flex; gap:18px; background:linear-gradient(120deg,rgba(255,255,255,.075),rgba(255,255,255,.025));
+    border:1px solid rgba(255,255,255,.12); border-radius:24px; padding:26px 26px; }
+  .num { flex:0 0 64px; height:64px; border-radius:18px; display:flex; align-items:center;
+    justify-content:center; font-size:27px; font-weight:900;
+    background:linear-gradient(150deg,rgba(56,189,248,.28),rgba(167,139,250,.28));
+    border:1px solid rgba(196,181,253,.4); color:#E0F2FE; }
+  .card .tt { font-size:29px; font-weight:900; color:#FFFFFF; letter-spacing:.3px; }
+  .card .tt span { color:#F0ABFC; }
+  .card .dd { font-size:21px; line-height:1.48; color:#B7C0DF; margin-top:7px; }
+  .card .dd b { color:#FDE68A; font-weight:800; }
+
+  .cmp { display:flex; flex-direction:column; gap:11px; }
+  .row { display:flex; align-items:center; gap:14px; background:rgba(255,255,255,.04);
+    border:1px solid rgba(255,255,255,.09); border-radius:17px; padding:17px 20px; }
+  .row .nm { flex:0 0 250px; font-size:21px; font-weight:800; color:#D7DDF2; }
+  .row .ft { flex:1; font-size:19px; color:#98A2C6; font-weight:600; line-height:1.35; }
+  .row .ft s { color:#6E779B; text-decoration:line-through; }
+  .row.win { background:linear-gradient(100deg,rgba(56,189,248,.17),rgba(232,121,249,.15));
+    border:1px solid rgba(196,181,253,.55); }
+  .row.win .nm { color:#FFFFFF; }
+  .row.win .ft { color:#E7E3FF; font-weight:700; }
+  .row.win .ft b { color:#FDE68A; }
+  .pill { font-size:15px; font-weight:900; color:#0A0E20; background:linear-gradient(100deg,#7DD3FC,#F0ABFC);
+    padding:3px 9px; border-radius:6px; margin-left:9px; vertical-align:2px; }
+
+  .day { display:flex; align-items:stretch; justify-content:space-between; gap:10px; }
+  .dstep { flex:1; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.1);
+    border-radius:18px; padding:20px 12px 17px; text-align:center; }
+  .dstep .di { font-size:27px; line-height:1; }
+  .dstep .dt { display:block; font-size:20px; font-weight:900; color:#E4E9FA; margin-top:7px; }
+  .dstep .dd2 { display:block; font-size:16px; color:#8B95B8; margin-top:3px; font-weight:600; }
+  .dar { align-self:center; color:#5A6488; font-size:19px; font-weight:800; }
+  .dnote { margin-top:12px; text-align:center; font-size:23px; color:#B9C2DE; font-weight:700; }
+  .dnote b { color:#FDE68A; font-weight:900; }
+  .dnote em { font-style:normal; color:#F0ABFC; }
+
+  .privacy { margin-top:26px; display:flex; align-items:center; gap:14px;
+    background:linear-gradient(100deg,rgba(52,199,89,.12),rgba(56,189,248,.10));
+    border:1px solid rgba(52,199,89,.32); border-radius:18px; padding:18px 26px; }
+  .privacy .pi { font-size:26px; }
+  .privacy .pt { font-size:22px; color:#C6D3C9; font-weight:700; line-height:1.4; }
+  .privacy .pt b { color:#86EFAC; font-weight:900; }
+
+  .foot { margin-top:auto; display:flex; align-items:center; justify-content:space-between; }
+  .chips { display:flex; gap:11px; }
+  .chip { font-size:20px; font-weight:800; color:#CDE6FF; background:rgba(56,189,248,.13);
+    border:1px solid rgba(56,189,248,.38); padding:10px 18px; border-radius:999px; }
+  .chip.warm { color:#FDE68A; background:rgba(251,191,36,.12); border-color:rgba(251,191,36,.4); }
+  .chip.pink { color:#F5D0FE; background:rgba(232,121,249,.13); border-color:rgba(232,121,249,.38); }
+  .repo { font-size:17px; color:#5E688C; font-weight:700; text-align:right; line-height:1.45; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="badge">✨ 凭什么值得装 · 三个硬亮点</span>
+
+  <h1>别人给你一份记录，<span class="grad">这套给你会响的闹钟</span></h1>
+  <p class="sub">官方「实时回放」只回看 <b>15 秒</b>、只给要点；这套每晚给你<i>完整三省日报</i>，还顺手把承诺变成提醒</p>
+
+  <div class="cols">
+
+    <div class="col">
+      <div class="label"><span class="tx">三个亮点</span><span class="ln"></span></div>
+      <div class="cards">
+
+        <div class="card">
+          <div class="num">01</div>
+          <div>
+            <div class="tt">承诺不用你记<span>，说出口就上待办</span></div>
+            <div class="dd">「下次我请」「今晚改好」——当晚自动进<b>提醒事项</b>，重要的再加<b>日历闹钟</b>，到点响。</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="num">02</div>
+          <div>
+            <div class="tt">音频永不出你的 Mac</div>
+            <div class="dd">iPhone 只负责录，<b>Mac 本地</b>跑开源 whisper 转写；出网的只有<b>文字稿</b>。</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="num">03</div>
+          <div>
+            <div class="tt">越用越懂你<span>，答一次记一辈子</span></div>
+            <div class="dd">拿不准「老X是谁」→ 备忘录里出<b>选择题</b> → 把 ▢ 改成 ✅，别名与事实一次学会。</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="label"><span class="tx">同类方案横向对照</span><span class="ln"></span></div>
+      <div class="cmp">
+        <div class="row">
+          <span class="nm">⌚ Apple Watch 回放</span>
+          <span class="ft">15 秒回放 · 只给要点 · <s>承诺不会提醒</s> · 换新表 ¥3k+</span>
+        </div>
+        <div class="row">
+          <span class="nm">🎧 Auday 类订阅 App</span>
+          <span class="ft">全天候录音 · AI 日记 · <s>承诺不会提醒</s> · 订阅制</span>
+        </div>
+        <div class="row">
+          <span class="nm">🍐 讯飞听见 / 通义听悟</span>
+          <span class="ft">手动上传 · 转写纪要 · <s>音频上云</s> · 按时长计费</span>
+        </div>
+        <div class="row win">
+          <span class="nm">🔁 三省（这套）<span class="pill">¥0</span></span>
+          <span class="ft"><b>自动触发 · 三省日报 · 承诺变闹钟 · 音频留本机</b></span>
+        </div>
+      </div>
+
+      <div class="label"><span class="tx">它的一天 · 全自动</span><span class="ln"></span></div>
+      <div class="day">
+        <div class="dstep"><span class="di">🌙</span><span class="dt">23:30</span><span class="dd2">自动开工</span></div>
+        <span class="dar">→</span>
+        <div class="dstep"><span class="di">🧠</span><span class="dt">Mac 转写</span><span class="dd2">声音不出门</span></div>
+        <span class="dar">→</span>
+        <div class="dstep"><span class="di">✨</span><span class="dt">LLM 提取</span><span class="dd2">承诺·事实·三省</span></div>
+        <span class="dar">→</span>
+        <div class="dstep"><span class="di">🍎</span><span class="dt">写回 App</span><span class="dd2">备忘录·提醒</span></div>
+      </div>
+      <div class="dnote">次日 <b>09:00</b>，闹钟替你把说过的话兑现 —— <em>你只管睡</em></div>
+    </div>
+
+  </div>
+
+  <div class="privacy">
+    <span class="pi">🔒</span>
+    <span class="pt">音频全程留在你的 <b>Mac</b> —— 出网的只有转写后的文字稿；备忘录 / 提醒事项 / 日历 / 通讯录全部走本机 AppleScript 写入</span>
+  </div>
+
+  <div class="foot">
+    <div class="chips">
+      <span class="chip">💸 ¥0 / 月</span>
+      <span class="chip warm">🔒 音频不出本机</span>
+      <span class="chip pink">📱 iPhone + 💻 Mac 全链路</span>
+      <span class="chip">📖 MIT 开源</span>
+    </div>
+    <div class="repo">github.com/lumiakey<br>junzi-wuri-sanxing</div>
+  </div>
+
+</div>
+</body>
+</html>

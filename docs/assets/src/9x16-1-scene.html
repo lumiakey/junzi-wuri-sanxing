@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1080px; height:1920px; overflow:hidden; }
+  body {
+    font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Apple Color Emoji",sans-serif;
+    background:
+      radial-gradient(900px 620px at 88% -6%, rgba(168,85,247,.30), transparent 62%),
+      radial-gradient(760px 560px at 4% 12%, rgba(56,189,248,.20), transparent 60%),
+      radial-gradient(900px 700px at 50% 108%, rgba(232,121,249,.16), transparent 62%),
+      linear-gradient(168deg,#080C1C 0%,#101736 40%,#1B1546 74%,#241448 100%);
+    color:#EEF1FF; padding:64px 62px 52px; position:relative;
+  }
+  .wrap { position:relative; z-index:2; height:100%; display:flex; flex-direction:column; }
+
+  .topbar { display:flex; align-items:center; justify-content:space-between; }
+  .badge { display:inline-flex; align-items:center; gap:10px; background:rgba(125,211,252,.11);
+    border:1px solid rgba(125,211,252,.38); color:#7DD3FC; font-size:23px; font-weight:700;
+    padding:11px 24px; border-radius:999px; letter-spacing:1.5px; }
+  .rec { display:inline-flex; align-items:center; gap:12px; background:rgba(244,63,94,.13);
+    border:1px solid rgba(244,63,94,.4); border-radius:999px; padding:9px 20px 9px 16px; }
+  .dot { width:12px; height:12px; border-radius:50%; background:#FB7185; box-shadow:0 0 14px #FB7185; }
+  .rec .txt { font-size:19px; font-weight:800; color:#FDA4AF; letter-spacing:1px; font-variant-numeric:tabular-nums; }
+  .wave { display:flex; align-items:center; gap:3px; height:22px; }
+  .wave i { display:block; width:3px; border-radius:2px; background:#FB7185; opacity:.85; }
+
+  h1 { font-size:100px; font-weight:900; line-height:1.16; letter-spacing:2px; margin-top:34px; }
+  .grad { background:linear-gradient(96deg,#7DD3FC 4%,#C4B5FD 46%,#F0ABFC 92%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { font-size:30px; line-height:1.62; color:#AEB7D8; margin-top:24px; letter-spacing:.4px; }
+  .sub b { color:#FDE68A; font-weight:800; }
+  .sub i { font-style:normal; color:#E9D5FF; font-weight:700; }
+
+  .label { display:flex; align-items:center; gap:14px; margin:40px 0 19px; }
+  .label .ln { flex:1; height:1px; background:linear-gradient(90deg,rgba(255,255,255,.2),transparent); }
+  .label .tx { font-size:22px; font-weight:800; color:#93A0C8; letter-spacing:2px; }
+
+  .scenes { display:flex; flex-direction:column; gap:22px; }
+  .scene { position:relative; background:linear-gradient(135deg,rgba(255,255,255,.075),rgba(255,255,255,.026));
+    border:1px solid rgba(255,255,255,.13); border-radius:28px; padding:26px 30px 26px 32px;
+    box-shadow:0 18px 44px -28px rgba(0,0,0,.9); }
+  .scene::before { content:""; position:absolute; left:0; top:26px; bottom:26px; width:5px;
+    border-radius:4px; background:linear-gradient(#38BDF8,#A78BFA,#F0ABFC); }
+  .shead { display:flex; align-items:center; gap:14px; }
+  .tag { font-size:22px; font-weight:800; color:#BFDBFE; background:rgba(59,130,246,.17);
+    border:1px solid rgba(96,165,250,.4); padding:6px 16px; border-radius:999px; }
+  .stime { font-size:20px; color:#7C87AC; font-weight:600; font-variant-numeric:tabular-nums; }
+  .say { font-size:45px; font-weight:800; color:#FFFFFF; margin-top:14px; line-height:1.26; letter-spacing:.5px; }
+  .say .q { color:#7DD3FC; font-weight:900; margin-right:2px; }
+  .res { display:flex; align-items:flex-start; gap:12px; margin-top:13px;
+    background:linear-gradient(100deg,rgba(167,139,250,.14),rgba(232,121,249,.08));
+    border:1px solid rgba(196,181,253,.26); border-radius:18px; padding:13px 18px; }
+  .res .ai { flex:0 0 auto; font-size:17px; font-weight:900; color:#0B1024; letter-spacing:1px;
+    background:linear-gradient(120deg,#7DD3FC,#C4B5FD); padding:3px 10px; border-radius:8px; margin-top:3px; }
+  .res .rt { font-size:26px; line-height:1.44; color:#D3D9F0; }
+  .res .rt b { color:#FDE68A; font-weight:800; font-variant-numeric:tabular-nums; }
+  .res .rt em { font-style:normal; color:#F0ABFC; font-weight:800; }
+
+  .outs { display:flex; gap:14px; }
+  .out { flex:1; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.11);
+    border-radius:22px; padding:26px 10px 24px; text-align:center; }
+  .out .oi { font-size:42px; line-height:1.1; }
+  .out .ot { font-size:24px; font-weight:800; color:#DDD6FE; margin-top:11px; }
+  .out .od { font-size:18px; color:#8E98BE; margin-top:5px; line-height:1.35; }
+
+  .strip { margin-top:24px; display:flex; align-items:center; justify-content:space-between;
+    background:rgba(255,255,255,.04); border:1px dashed rgba(196,181,253,.3);
+    border-radius:20px; padding:20px 28px; }
+  .strip .st { font-size:21px; color:#A9B3D6; font-weight:700; letter-spacing:.5px; }
+  .strip .st b { color:#93C5FD; font-weight:800; }
+  .strip .ar { color:#59638A; font-size:20px; }
+
+  .foot { margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:14px; }
+  .chips { display:flex; gap:11px; flex-wrap:wrap; }
+  .chip { font-size:21px; font-weight:800; color:#CDE6FF; background:rgba(56,189,248,.14);
+    border:1px solid rgba(56,189,248,.4); padding:11px 19px; border-radius:999px; }
+  .chip.warm { color:#FDE68A; background:rgba(251,191,36,.13); border-color:rgba(251,191,36,.42); }
+  .chip.pink { color:#F5D0FE; background:rgba(232,121,249,.14); border-color:rgba(232,121,249,.4); }
+  .repo { font-size:18px; color:#5E688C; font-weight:700; letter-spacing:.4px; text-align:right; line-height:1.5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span class="badge">🔁 君子吾日三省 · 开源</span>
+    <span class="rec">
+      <span class="dot"></span>
+      <span class="wave">
+        <i style="height:8px"></i><i style="height:16px"></i><i style="height:11px"></i>
+        <i style="height:20px"></i><i style="height:13px"></i><i style="height:18px"></i>
+        <i style="height:9px"></i>
+      </span>
+      <span class="txt">02:47:13</span>
+    </span>
+  </div>
+
+  <h1>敲两下手机背面<br><span class="grad">AI 替你三省吾身</span></h1>
+  <p class="sub">Apple Watch 刚上线的「全天候录音」，<br>
+  我用 <b>¥0</b> 方案做了个更狠的 —— 它给你的是<i>会响的闹钟</i></p>
+
+  <div class="label"><span class="tx">三个真实到疼的场景</span><span class="ln"></span></div>
+
+  <div class="scenes">
+
+    <div class="scene">
+      <div class="shead"><span class="tag">💼 周一晨会</span><span class="stime">10:14 · 会议室</span></div>
+      <div class="say"><span class="q">“</span>今晚肯定改好发您<span class="q">”</span></div>
+      <div class="res"><span class="ai">当晚</span><span class="rt">次日 <b>09:00</b> 闹钟准时讨债 · 日报批注：<em>为人谋而不忠乎？</em></span></div>
+    </div>
+
+    <div class="scene">
+      <div class="shead"><span class="tag">🍻 朋友饭局</span><span class="stime">19:38 · 火锅店</span></div>
+      <div class="say"><span class="q">“</span>下次我请，一定<span class="q">”</span></div>
+      <div class="res"><span class="ai">当晚</span><span class="rt">台账第 <b>6</b> 次「下次我请」 · 朋友翻到：欠我四顿火锅</span></div>
+    </div>
+
+    <div class="scene">
+      <div class="shead"><span class="tag">💘 对象查岗</span><span class="stime">22:51 · 家里</span></div>
+      <div class="say"><span class="q">“</span>马上就好，真的<span class="q">”</span></div>
+      <div class="res"><span class="ai">当晚</span><span class="rt">本周第 <b>11</b> 次「马上就好」 · 日报批注：<em>与朋友交而不信乎？</em></span></div>
+    </div>
+
+  </div>
+
+  <div class="label"><span class="tx">每晚 23:30 · 自动产出</span><span class="ln"></span></div>
+
+  <div class="outs">
+    <div class="out"><div class="oi">📝</div><div class="ot">三省日报</div><div class="od">口头禅·表达分析</div></div>
+    <div class="out"><div class="oi">✅</div><div class="ot">提醒事项</div><div class="od">承诺自动上待办</div></div>
+    <div class="out"><div class="oi">⏰</div><div class="ot">日历闹钟</div><div class="od">重要承诺到点响</div></div>
+    <div class="out"><div class="oi">👤</div><div class="ot">通讯录</div><div class="od">生日等事实补全</div></div>
+  </div>
+
+  <div class="strip">
+    <span class="st">📱 录音</span><span class="ar">→</span>
+    <span class="st"><b>本机转写</b></span><span class="ar">→</span>
+    <span class="st">✨ LLM 提取</span><span class="ar">→</span>
+    <span class="st">🍎 写回 App</span>
+  </div>
+
+  <div class="foot">
+    <div class="chips">
+      <span class="chip">💸 ¥0 / 月</span>
+      <span class="chip warm">🔒 音频不出本机</span>
+      <span class="chip pink">🌙 全自动</span>
+    </div>
+    <div class="repo">github.com/lumiakey<br>junzi-wuri-sanxing</div>
+  </div>
+
+</div>
+</body>
+</html>

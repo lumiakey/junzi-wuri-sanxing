@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1600px; height:1200px; overflow:hidden; }
+  body {
+    font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Apple Color Emoji",sans-serif;
+    background:
+      radial-gradient(820px 560px at 4% 0%, rgba(56,189,248,.22), transparent 60%),
+      radial-gradient(760px 560px at 96% 8%, rgba(168,85,247,.24), transparent 62%),
+      radial-gradient(1000px 620px at 50% 112%, rgba(232,121,249,.14), transparent 62%),
+      linear-gradient(172deg,#070B18 0%,#0D1430 44%,#171243 78%,#211247 100%);
+    color:#EEF1FF; padding:56px 70px 48px; position:relative;
+  }
+  .wrap { position:relative; z-index:2; height:100%; display:flex; flex-direction:column; }
+
+  .badge { display:inline-flex; align-items:center; gap:10px; background:rgba(125,211,252,.11);
+    border:1px solid rgba(125,211,252,.36); color:#7DD3FC; font-size:22px; font-weight:800;
+    padding:10px 24px; border-radius:999px; letter-spacing:1.5px; align-self:flex-start; }
+  h1 { font-size:74px; font-weight:900; line-height:1.18; letter-spacing:1px; margin-top:24px; }
+  .grad { background:linear-gradient(96deg,#7DD3FC 4%,#C4B5FD 48%,#F0ABFC 94%);
+    -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { font-size:26px; line-height:1.5; color:#AEB7D8; margin-top:14px; }
+  .sub b { color:#FDE68A; font-weight:800; }
+
+  .label { display:flex; align-items:center; gap:14px; margin:38px 0 18px; }
+  .label .ln { flex:1; height:1px; background:linear-gradient(90deg,rgba(255,255,255,.2),transparent); }
+  .label .tx { font-size:21px; font-weight:800; color:#93A0C8; letter-spacing:2px; }
+
+  .diagram { display:flex; align-items:stretch; gap:0; }
+  .node { background:linear-gradient(140deg,rgba(255,255,255,.08),rgba(255,255,255,.025));
+    border:1px solid rgba(255,255,255,.13); border-radius:26px; padding:26px 26px 24px; }
+  .node.phone { flex:0 0 356px; }
+  .node.mac { flex:1; border-color:rgba(125,211,252,.34);
+    background:linear-gradient(140deg,rgba(56,189,248,.13),rgba(255,255,255,.03)); }
+  .node.cloud { flex:0 0 300px; border-color:rgba(253,230,138,.3);
+    background:linear-gradient(140deg,rgba(253,230,138,.1),rgba(255,255,255,.03)); }
+  .nh { display:flex; align-items:center; gap:12px; }
+  .nh .ic { font-size:32px; line-height:1; }
+  .nh .nm { font-size:28px; font-weight:900; }
+  .nh .role { font-size:17px; font-weight:800; color:#93A0C8; background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.14); padding:3px 10px; border-radius:8px; margin-left:auto; }
+  .nd { font-size:20px; line-height:1.5; color:#AEB7D8; margin-top:12px; }
+
+  .rows { margin-top:16px; display:flex; flex-direction:column; gap:9px; }
+  .r { display:flex; align-items:center; gap:10px; background:rgba(255,255,255,.05);
+    border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px 14px;
+    font-size:19px; color:#D3D9F0; font-weight:700; }
+  .r .k { color:#7DD3FC; font-weight:900; }
+
+  .steps { margin-top:16px; display:flex; flex-direction:column; gap:10px; }
+  .st { display:flex; align-items:center; gap:14px; background:rgba(8,12,28,.42);
+    border:1px solid rgba(255,255,255,.09); border-radius:14px; padding:14px 18px; }
+  .st .sn { flex:0 0 30px; height:30px; border-radius:9px; background:rgba(125,211,252,.2);
+    border:1px solid rgba(125,211,252,.4); color:#BAE6FD; font-size:16px; font-weight:900;
+    display:flex; align-items:center; justify-content:center; }
+  .st .sx { font-size:20px; font-weight:800; color:#E6EBFA; }
+  .st .sx em { font-style:normal; font-size:17px; color:#93A0C8; font-weight:700; margin-left:8px; }
+  .st .tagm { margin-left:auto; font-size:15px; font-weight:900; color:#0A0E20;
+    background:linear-gradient(100deg,#7DD3FC,#C4B5FD); padding:3px 9px; border-radius:6px; }
+
+  .arrow { flex:0 0 74px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; }
+  .arrow .ay { font-size:26px; color:#5E6A94; font-weight:900; }
+  .arrow .at { font-size:15px; color:#7C87AC; font-weight:800; letter-spacing:.5px; }
+
+  .bnd { flex:0 0 92px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; }
+  .bnd .ln { width:0; flex:1; border-left:2px dashed rgba(253,230,138,.5); }
+  .bnd .bt { font-size:15px; font-weight:900; color:#FDE68A; writing-mode:vertical-rl;
+    letter-spacing:3px; padding:10px 0; }
+  .bnd .ln2 { width:0; flex:1; border-left:2px dashed rgba(253,230,138,.5); }
+
+  .details { display:flex; gap:20px; }
+  .det { flex:1; background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.1);
+    border-radius:20px; padding:24px 24px; }
+  .det .dh { display:flex; align-items:center; gap:10px; font-size:22px; font-weight:900; color:#FFFFFF; }
+  .det .dh span { font-size:24px; }
+  .det .dt { font-size:18px; line-height:1.55; color:#A6B0D2; margin-top:8px; font-weight:600; }
+  .det .dt b { color:#FDE68A; font-weight:800; }
+
+  .foot { margin-top:auto; display:flex; align-items:center; justify-content:space-between; }
+  .chips { display:flex; gap:11px; }
+  .chip { font-size:20px; font-weight:800; color:#CDE6FF; background:rgba(56,189,248,.13);
+    border:1px solid rgba(56,189,248,.38); padding:10px 18px; border-radius:999px; }
+  .chip.green { color:#BBF7D0; background:rgba(52,199,89,.13); border-color:rgba(52,199,89,.4); }
+  .chip.warm { color:#FDE68A; background:rgba(251,191,36,.12); border-color:rgba(251,191,36,.4); }
+  .repo { font-size:17px; color:#5E688C; font-weight:700; text-align:right; line-height:1.45; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <span class="badge">🔁 它是怎么跑起来的</span>
+
+  <h1>iPhone 只负责录，<span class="grad">Mac 负责想</span></h1>
+  <p class="sub">一条本机流水线：声音文件从不离开你的电脑，<b>出网的只有文字稿</b></p>
+
+  <div class="label"><span class="tx">设备分工与数据边界</span><span class="ln"></span></div>
+
+  <div class="diagram">
+
+    <div class="node phone">
+      <div class="nh"><span class="ic">📱</span><span class="nm">iPhone</span><span class="role">录音端</span></div>
+      <div class="nd">不用装 App，靠系统自带「语音备忘录」+ 快捷指令自动触发。</div>
+      <div class="rows">
+        <div class="r"><span class="k">①</span>敲两下手机背面</div>
+        <div class="r"><span class="k">②</span>连上公司 Wi-Fi</div>
+        <div class="r"><span class="k">③</span>到达某个地点</div>
+      </div>
+    </div>
+
+    <div class="arrow"><span class="ay">→</span><span class="at">iCloud</span></div>
+
+    <div class="node mac">
+      <div class="nh"><span class="ic">💻</span><span class="nm">Mac</span><span class="role">处理端 · 全程本机</span></div>
+      <div class="nd">每晚 23:30 由 launchd 自动唤醒，跑完四步就睡。</div>
+      <div class="steps">
+        <div class="st"><span class="sn">1</span><span class="sx">收录音<em>iCloud 同步 + inbox 手动投喂</em></span></div>
+        <div class="st"><span class="sn">2</span><span class="sx">本机转写<em>whisper.cpp · large-v3-turbo</em></span></div>
+        <div class="st"><span class="sn">3</span><span class="sx">LLM 提取<em>承诺 / 期限 / 人名事实 / 三省</em></span><span class="tagm">只发文字稿</span></div>
+        <div class="st"><span class="sn">4</span><span class="sx">写回 App<em>备忘录 · 提醒事项 · 日历 · 通讯录</em></span></div>
+      </div>
+    </div>
+
+    <div class="bnd"><span class="ln"></span><span class="bt">网络边界</span><span class="ln2"></span></div>
+
+    <div class="node cloud">
+      <div class="nh"><span class="ic">✨</span><span class="nm">云端 LLM</span></div>
+      <div class="nd">只收<b style="color:#FDE68A">转写后的文字</b>，拿不到任何音频。</div>
+      <div class="rows">
+        <div class="r"><span class="k">·</span>说给谁的承诺</div>
+        <div class="r"><span class="k">·</span>期限与重要度</div>
+        <div class="r"><span class="k">·</span>「老X是谁」</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="label"><span class="tx">三个不显眼但很关键的工程细节</span><span class="ln"></span></div>
+
+  <div class="details">
+    <div class="det">
+      <div class="dh"><span>🗂</span>只处理新录音</div>
+      <div class="dt">按 <b>文件名+大小</b> 记进 processed.txt，重跑不会重复扣额度，也不会重复写待办。</div>
+    </div>
+    <div class="det">
+      <div class="dh"><span>🛟</span>额度不够自动降级</div>
+      <div class="dt">遇到 <b>429 / 1113</b> 自动切到 glm-4-flash，日报不会因为额度断了就消失。</div>
+    </div>
+    <div class="det">
+      <div class="dh"><span>🤝</span>拿不准就问</div>
+      <div class="dt">人名有歧义 → 备忘录里出<b>选择题</b>，把 ▢ 改成 ✅，答一次终身记住。</div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="chips">
+      <span class="chip green">🔒 音频 0 上传</span>
+      <span class="chip">💻 本机 AppleScript 写入</span>
+      <span class="chip warm">📱💻 iPhone + Mac 全链路</span>
+    </div>
+    <div class="repo">github.com/lumiakey<br>junzi-wuri-sanxing</div>
+  </div>
+
+</div>
+</body>
+</html>
