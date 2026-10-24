@@ -1,4 +1,4 @@
-# 🔁 三省 · sanxing — 敲两下手机背面，AI 帮你三省吾身
+# 🔁 君子吾日三省 — 敲两下手机背面，AI 帮你三省吾身
 
 > **全天候录音 → 本地转写 → LLM 分析 → 苹果四件套自动联动**
 > 曾子说吾日三省吾身。两千五百年后，工具终于配得上这句话了。
@@ -53,7 +53,7 @@ curl -L -o ~/sanxing/models/ggml-large-v3-turbo.bin --create-dirs \
   https://hf-mirror.com/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo.bin
 
 # 3. 安装
-git clone https://github.com/lumiakey/sanxing.git && cd sanxing
+git clone https://github.com/lumiakey/junzi-wuri-sanxing.git && cd junzi-wuri-sanxing
 bash setup.sh
 ```
 
