@@ -52,6 +52,14 @@ fi
 NEW=0
 # 消化联系人线索: 读备忘录别名映射, 回填挂起的歧义待办(用户回答歧义的通道)
 python3 "$ROOT/bin/resolve_mentions.py" || echo "线索消化异常(不影响后续)"
+
+# 声纹注册: inbox里出现命名为"声纹注册"的音频则更新注册样本(30-60秒本人真声)
+REG_SRC=$(ls "$INBOX" 2>/dev/null | grep -i "声纹注册" | head -1 || true)
+if [ -n "$REG_SRC" ]; then
+  if "$FFMPEG" -y -v error -i "$INBOX/$REG_SRC" -ar 16000 -ac 1 "$ROOT/data/state/声纹注册.wav"; then
+    mv "$INBOX/$REG_SRC" "$ARCHIVE/" && echo "✅ 声纹注册已更新(来自 $REG_SRC)"
+  fi
+fi
 while IFS= read -r f; do
   [ -z "$f" ] && continue
   BASE="$(basename "$f")"
@@ -73,6 +81,13 @@ while IFS= read -r f; do
 
   OUTBASE="$TRANS/${MTIME}_$(echo "$SAFE" | sed 's/\.[^.]*$//')"
   "$WHISPER" -m "$MODEL" -l zh -f "$WAV" -otxt -osrt -of "$OUTBASE" -t 8 --prompt "以下是普通话的句子。" || { rm -f "$WAV"; echo "转写失败"; continue; }
+
+  # 说话人分离(本地声纹): 成功则生成 .spk.txt 带说话人标签的转写; 失败则无标签继续
+  if [ -x "$ROOT/venv/bin/python3" ] && [ -f "$ROOT/models/sherpa-onnx-pyannote-segmentation-3.0/model.int8.onnx" ]; then
+    "$ROOT/venv/bin/python3" "$ROOT/bin/diarize.py" "$WAV" "$OUTBASE.srt" 2>&1 | tail -3 || echo "分离失败(继续无标签分析)"
+  else
+    echo "未配置声纹分离环境(venv/模型), 无标签分析"
+  fi
   rm -f "$WAV"
 
   python3 "$ROOT/bin/analyze.py" "$OUTBASE.txt" "$OUTBASE.srt" "$DUR" "$STASH" || echo "分析步骤异常(转写结果不受影响)"

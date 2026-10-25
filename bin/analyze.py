@@ -47,13 +47,21 @@ if not api_key:
 
 text = open(TXT, encoding="utf-8").read()
 srt_text = open(SRT, encoding="utf-8").read()
-cjk = len(re.findall(r"[\u4e00-\u9fff]", text))
+
+# 说话人分离结果: 存在 .spk.txt 则用带标签转写, 统计只算"我"的发言
+SPK = SRT[: SRT.rfind(".")] + ".spk.txt"
+has_spk = os.path.exists(SPK)
+spk_lines = open(SPK, encoding="utf-8").read().splitlines() if has_spk else []
+me_lines = [re.sub(r"^\[[^\]]*\]\s*", "", l.split(":", 1)[1]) for l in spk_lines if "] 我:" in l]
+has_me = len(me_lines) > 0
+stat_text = "".join(me_lines) if has_me else text
+cjk = len(re.findall(r"[\u4e00-\u9fff]", stat_text))
 dur_min = max(DUR / 60.0, 0.01)
 
 FILLERS = ["然后", "就是", "那个", "这个", "其实", "怎么说", "嗯", "额", "呃",
            "对吧", "对不对", "你知道吗", "基本上", "反正", "就是说", "然后呢",
            "老实说", "事实上", "的话", "一下"]
-fillers = {w: text.count(w) for w in FILLERS if text.count(w) > 0}
+fillers = {w: stat_text.count(w) for w in FILLERS if stat_text.count(w) > 0}
 
 
 def srt_segments(s):
@@ -102,7 +110,12 @@ def call_glm(seg_md, idx, total):
     weekday = "一二三四五六日"[today.weekday()]
     sys_prompt = (
         "你是用户的自省助手。输入是用户当天说话录音的转写(带时间戳,用户视角录音,"
-        "他人话语可能不清晰)。只输出一个JSON对象,不要任何其他文字:\n"
+        "他人话语可能不清晰)。"
+        + ("**本次输入带说话人标签: '我:'是用户本人, 其余'说话人X:'是他人。"
+           "承诺/口头禅/表达习惯/三省只从'我:'的发言提取; 他人发言仅作上下文"
+           "(用于确认对象与期限, 如对方说'你明天发我'且我回应'好'即为我的承诺)。"
+           "若本段没有'我:'的发言, 相应字段给空值。**" if has_spk else "")
+        + "只输出一个JSON对象,不要任何其他文字:\n"
         '{"promises":[{"time":"mm:ss","quote":"原话","to":"说给谁(推断,未知填?)",'
         '"deadline_display":"期限的人话描述或无",'
         '"deadline_iso":"YYYY-MM-DDTHH:MM,无明确期限填null,只有日期默认当天09:00",'
@@ -209,14 +222,26 @@ def merge_results(rs):
 llm = None
 skip_reason = None
 if api_key and cjk >= 10:
-    segs = srt_segments(srt_text)
-    if segs:
-        chunks = chunk_segments(segs)
-        seg_texts = ["\n".join(f"[{t}] {x}" for t, x in ch) for ch in chunks]
+    if has_spk:
+        # 带说话人标签: 按行分块
+        chunks_txt, cur, size = [], [], 0
+        for l in spk_lines:
+            if cur and size + len(l) > 12000:
+                chunks_txt.append("\n".join(cur))
+                cur, size = [], 0
+            cur.append(l)
+            size += len(l) + 1
+        if cur:
+            chunks_txt.append("\n".join(cur))
+        seg_texts = chunks_txt
     else:
-        raw = text.strip()
-        seg_texts = [raw[i:i + 12000] for i in range(0, len(raw), 12000)]
-    print(f"GLM分析: 转写{cjk}字, 分{len(seg_texts)}段调用")
+        segs = srt_segments(srt_text)
+        if segs:
+            seg_texts = ["\n".join(f"[{t}] {x}" for t, x in ch) for ch in chunk_segments(segs)]
+        else:
+            raw = text.strip()
+            seg_texts = [raw[i:i + 12000] for i in range(0, len(raw), 12000)]
+    print(f"GLM分析: {'我的' if has_me else ''}语料{cjk}字, 分{len(seg_texts)}段调用" + (" (带说话人标签)" if has_spk else ""))
     results = []
     for i, seg_md in enumerate(seg_texts):
         if i:

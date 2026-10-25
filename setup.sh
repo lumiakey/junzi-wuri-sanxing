@@ -18,6 +18,23 @@ command -v ffmpeg >/dev/null || { echo "✗ 缺少 ffmpeg: brew install ffmpeg";
 [ $MISSING -eq 1 ] && { echo "请先安装上述依赖后重跑本脚本"; exit 1; }
 echo "✓ 依赖检查通过"
 
+# 2.5 声纹分离环境(可选但推荐): venv + sherpa-onnx + 模型
+echo "── 配置说话人分离环境(约70MB模型) ──"
+python3 -m venv "$ROOT/venv" 2>/dev/null
+"$ROOT/venv/bin/pip" install -q sherpa-onnx numpy 2>&1 | grep -v WARNING || true
+mkdir -p "$ROOT/models/sherpa-onnx-pyannote-segmentation-3.0"
+SEG="$ROOT/models/sherpa-onnx-pyannote-segmentation-3.0/model.int8.onnx"
+EMB="$ROOT/models/3dspeaker_speech_eres2netv2_sv_zh-cn_16k-common.onnx"
+[ -f "$SEG" ] || curl -sL --fail --retry 3 -o "$SEG" \
+  "https://hf-mirror.com/csukuangfj/sherpa-onnx-pyannote-segmentation-3-0/resolve/main/model.int8.onnx" \
+  || echo "△ 分割模型下载失败(可稍后手动下载到 $SEG)"
+[ -f "$EMB" ] || curl -sL --fail --retry 3 -o "$EMB" \
+  "https://mirror.ghproxy.com/https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_eres2netv2_sv_zh-cn_16k-common.onnx" \
+  || curl -sL --fail --retry 3 -o "$EMB" \
+  "https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_eres2netv2_sv_zh-cn_16k-common.onnx" \
+  || echo "△ 声纹模型下载失败(可稍后手动下载到 $EMB)"
+"$ROOT/venv/bin/python3" -c "import sherpa_onnx" 2>/dev/null && echo "✓ 声纹分离环境就绪" || echo "△ 声纹分离暂不可用(流水线将无标签分析,不影响其余功能)"
+
 # 3. 专用解释器(承接完全磁盘访问权限; macOS 26 需重签名否则 launchd 拒启)
 cp /bin/bash "$ROOT/bin/sanxing-bash"
 chmod +x "$ROOT/bin/sanxing-bash"
