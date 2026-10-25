@@ -12,11 +12,19 @@ on run argv
 			set hits to every note whose name is nm
 			if (count of hits) is 0 then
 				make new note with properties {name:nm, body:bdy}
+				# 新建后索引延迟可能再查不到/或历史已存在多条, 二次核对去重
+				delay 2
+				set hits2 to every note whose name is nm
+				repeat while (count of hits2) > 1
+					delete item 2 of hits2
+					set hits2 to every note whose name is nm
+				end repeat
 			else
 				set body of item 1 of hits to bdy
-				if (count of hits) > 1 then
-					delete (items 2 thru -1 of hits)
-				end if
+				repeat while (count of hits) > 1
+					delete item 2 of hits
+					set hits to every note whose name is nm
+				end repeat
 			end if
 		end tell
 	end tell

@@ -32,8 +32,7 @@ def read_key_from_notes():
 
 
 api_key = os.environ.get("GLM_API_KEY", "")
-model = os.environ.get("GLM_MODEL", "glm-4-flash")
-LLM_BASE = os.environ.get("GLM_BASE", "https://open.bigmodel.cn/api/paas/v4/chat/completions")
+model = os.environ.get("GLM_MODEL", "glm-5.3-flash")
 if os.path.exists(CFG):
     for line in open(CFG, encoding="utf-8"):
         line = line.strip()
@@ -43,8 +42,6 @@ if os.path.exists(CFG):
                 api_key = v.strip()
             if k == "GLM_MODEL" and v.strip():
                 model = v.strip()
-            if k == "GLM_BASE" and v.strip():
-                LLM_BASE = v.strip()
 if not api_key:
     api_key = read_key_from_notes()
 
@@ -135,7 +132,7 @@ def call_glm(seg_md, idx, total):
                            "temperature": 0.3,
                            "max_tokens": 4096}).encode()
         req = urllib.request.Request(
-            LLM_BASE, data=body,
+            "https://open.bigmodel.cn/api/paas/v4/chat/completions", data=body,
             headers={"Content-Type": "application/json", "Authorization": f"Bearer {api_key}"})
         try:
             with urllib.request.urlopen(req, timeout=180) as r:
@@ -163,6 +160,10 @@ def call_glm(seg_md, idx, total):
             print(f"GLM分析失败(第{idx + 1}/{total}段):", e)
             return None
         except Exception as e:
+            if "timed out" in str(e).lower() and attempt < 2:
+                print(f"第{idx + 1}段请求超时, {3 * (attempt + 1)}秒后重试")
+                time.sleep(3 * (attempt + 1))
+                continue
             print(f"GLM分析失败(第{idx + 1}/{total}段):", e)
             return None
     return None

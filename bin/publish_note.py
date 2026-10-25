@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 """日报渲染器: 汇总当天所有录音的分析JSON -> 一份md报告(覆盖) + 备忘录笔记(更新)
 三类分节: 📖传不习乎·分析表达 / 🤝与朋友交而不信乎·承诺记录 / 🪞吾日三省·自省报告"""
-import os, re, json, glob, subprocess, datetime
+import os, re, json, glob, subprocess, datetime, sys
 
 ROOT = os.path.expanduser("~/sanxing")
 REPORTS = os.path.join(ROOT, "data", "reports")
 COMMIT = os.path.join(ROOT, "data", "commitments", "台账.md")
-today = datetime.date.today().isoformat()
+# 可传参指定日期(补出历史报告), 默认今天
+today = sys.argv[1] if len(sys.argv) > 1 else datetime.date.today().isoformat()
 ADIR = os.path.join(ROOT, "data", "analysis", today)
 
 
@@ -101,9 +102,9 @@ for r in main:
     for q in L.get("quote_highlights", []):
         if q and q not in highlights:
             highlights.append(q)
-    for v in (L.get("filler_obs") or "").strip(), :
-        if v and v not in obs_set:
-            obs_set.append(v)
+    v = (L.get("filler_obs") or "").strip()
+    if v and v not in obs_set:
+        obs_set.append(v)
     v = (L.get("patterns") or "").strip()
     if v and v not in pat_set:
         pat_set.append(v)
@@ -135,10 +136,10 @@ else:
 M.append("")
 M.append("### 表达观察")
 M.append("")
-M.extend("".join(obs_set) if obs_set else ["(今日无观察)"])
+M.append("  \n".join(obs_set) if obs_set else "(今日无观察)")
 if pat_set:
     M.append("")
-    M.extend(pat_set)
+    M.append("  \n".join(pat_set))
 M.append("")
 M.append("## 🤝 与朋友交而不信乎 · 承诺记录")
 M.append("")
