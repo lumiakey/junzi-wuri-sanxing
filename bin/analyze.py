@@ -58,6 +58,10 @@ stat_text = "".join(me_lines) if has_me else text
 cjk = len(re.findall(r"[\u4e00-\u9fff]", stat_text))
 dur_min = max(DUR / 60.0, 0.01)
 
+# 日期按录音文件名归属(避免23:30任务跑过零点后错记到次日)
+_m = re.search(r"(\d{4})(\d{2})(\d{2})_\d{6}-", os.path.basename(AUDIO))
+today = f"{_m.group(1)}-{_m.group(2)}-{_m.group(3)}" if _m else datetime.date.today().isoformat()
+
 FILLERS = ["然后", "就是", "那个", "这个", "其实", "怎么说", "嗯", "额", "呃",
            "对吧", "对不对", "你知道吗", "基本上", "反正", "就是说", "然后呢",
            "老实说", "事实上", "的话", "一下"]
@@ -104,14 +108,14 @@ if model != "glm-4-flash":
 ACTIVE = 0
 
 
-def call_glm(seg_md, idx, total):
+def call_glm(seg_md, idx, total, date_iso=None):
     global ACTIVE
-    today = datetime.date.today()
+    today = datetime.date.fromisoformat(date_iso) if date_iso else datetime.date.today()
     weekday = "一二三四五六日"[today.weekday()]
     sys_prompt = (
         "你是用户的自省助手。输入是用户当天说话录音的转写(带时间戳,用户视角录音,"
         "他人话语可能不清晰)。"
-        + ("**本次输入带说话人标签: '我:'是用户本人, 其余标签(如'说话人X:'或人名如'老X:')是他人。"
+        + ("**本次输入带说话人标签: '我:'是用户本人, 其余标签(如'说话人X:'或人名如'老唐:')是他人。"
            "承诺/口头禅/表达习惯/三省只从'我:'的发言提取; 他人发言仅作上下文"
            "(用于确认对象与期限, 如对方说'你明天发我'且我回应'好'即为我的承诺)。"
            "若本段没有'我:'的发言, 相应字段给空值。**" if has_spk else "")
@@ -131,12 +135,13 @@ def call_glm(seg_md, idx, total):
         '"quote_highlights":["当天最有自省价值的原话1-3条"]}\n'
         "承诺判定: 说话人向他人许下的我会/我明天/下周/某日前+动作均算, 模糊客套deadline_iso填null; "
         "memorize收录应记住的事项; mentions只收录音中明确说出的某人的具体事实(如某人生日几号), "
-        "没有就给空数组,不要臆测。"
+        "没有就给空数组,不要臆测。无论内容多么重复或嘈杂, 都必须输出结构完整的非空JSON对象"
+        "(数组字段可为[]), 严禁只输出{}。"
     )
     head = f"今天是{today.isoformat()}星期{weekday}。\n"
     if total > 1:
         head += f"(这是当天录音的第{idx + 1}/{total}段转写,请独立分析本段)\n"
-    for attempt in range(3):
+    for attempt in range(5):
         m = MODELS[min(ACTIVE, len(MODELS) - 1)]
         body = json.dumps({"model": m,
                            "messages": [
@@ -152,7 +157,11 @@ def call_glm(seg_md, idx, total):
                 data = json.load(r)
             raw = data["choices"][0]["message"]["content"].strip()
             raw = re.sub(r"^```(json)?|```$", "", raw, flags=re.M).strip()
-            return json.loads(raw)
+            obj = json.loads(raw)
+            if not isinstance(obj, dict) or not obj:
+                fr = data["choices"][0].get("finish_reason", "?")
+                raise json.JSONDecodeError(f"空JSON(finish={fr},raw={raw[:60]!r})", raw[:100], 0)
+            return obj
         except urllib.error.HTTPError as e:
             msg = ""
             try:
@@ -166,9 +175,10 @@ def call_glm(seg_md, idx, total):
             print(f"GLM分析失败(第{idx + 1}/{total}段) HTTP{e.code}: {msg[:80]}")
             return None
         except json.JSONDecodeError as e:
-            if attempt < 2:
-                print(f"第{idx + 1}段JSON不完整({str(e)[:60]}), 重试")
-                time.sleep(2)
+            if attempt < 4:
+                wait = 8 * (attempt + 1)
+                print(f"第{idx + 1}段JSON不完整({str(e)[:70]}), {wait}秒后重试")
+                time.sleep(wait)
                 continue
             print(f"GLM分析失败(第{idx + 1}/{total}段):", e)
             return None
@@ -223,6 +233,18 @@ llm = None
 skip_reason = None
 if api_key and cjk >= 10:
     if has_spk:
+        # 折叠whisper复读循环(连续相同文本只留2次), 防止模型对重复垃圾输出空JSON
+        dedup, last, cnt = [], "", 0
+        for l in spk_lines:
+            body_l = re.sub(r"^\[[^\]]*\]\s*[^:]*:\s*", "", l).strip()
+            if body_l == last:
+                cnt += 1
+                if cnt > 2:
+                    continue
+            else:
+                last, cnt = body_l, 0
+            dedup.append(l)
+        spk_lines = dedup
         # 带说话人标签: 按行分块
         chunks_txt, cur, size = [], [], 0
         for l in spk_lines:
@@ -246,7 +268,7 @@ if api_key and cjk >= 10:
     for i, seg_md in enumerate(seg_texts):
         if i:
             time.sleep(1)
-        results.append(call_glm(seg_md, i, len(seg_texts)))
+        results.append(call_glm(seg_md, i, len(seg_texts), today))
     llm = merge_results(results) if any(results) else None
     if llm is None:
         print("GLM全部分析失败(本条降级为统计)")
@@ -265,7 +287,6 @@ def parse_iso(s):
         return None
 
 
-today = datetime.date.today().isoformat()
 contact_actions = []
 
 # ---- 联动苹果三件套 ----
