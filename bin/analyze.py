@@ -132,10 +132,17 @@ def call_glm(seg_md, idx, total, date_iso=None):
         '"sanxing":{"为人谋":"今天答应别人/替别人做的事与诚意,1-2句",'
         '"与朋友交":"沟通中的诚信与温度,1-2句",'
         '"传习":"今天口头暴露的坏习惯或值得保持的优点,1-2句"},'
-        '"quote_highlights":["当天最有自省价值的原话1-3条"]}\n'
+        '"quote_highlights":["当天最有自省价值的原话1-3条"],'
+        '"people":[{"name":"带真名标签的他人(仅人名,匿名说话人X不分析)",'
+        '"viewpoint":"此人表达的核心观点,1-2句",'
+        '"profile":"人物画像:身份角色/关注点/说话风格,中性客观",'
+        '"attitude":"与我(用户)的关系和态度,中性描述不评判,无信息填无",'
+        '"expectations":"对我的要求/期盼/诉求,无则填无",'
+        '"facts":"提到的关键事实(数字/日期/事件),无则填无"}]}\n'
         "承诺判定: 说话人向他人许下的我会/我明天/下周/某日前+动作均算, 模糊客套deadline_iso填null; "
         "memorize收录应记住的事项; mentions只收录音中明确说出的某人的具体事实(如某人生日几号), "
-        "没有就给空数组,不要臆测。无论内容多么重复或嘈杂, 都必须输出结构完整的非空JSON对象"
+        "没有就给空数组,不要臆测; people只收录带真名标签的他人, 全部匿名则给空数组。"
+        "无论内容多么重复或嘈杂, 都必须输出结构完整的非空JSON对象"
         "(数组字段可为[]), 严禁只输出{}。"
     )
     head = f"今天是{today.isoformat()}星期{weekday}。\n"
@@ -193,7 +200,7 @@ def call_glm(seg_md, idx, total, date_iso=None):
 
 
 def merge_results(rs):
-    out = {"promises": [], "memorize": [], "mentions": [], "quote_highlights": [],
+    out = {"promises": [], "memorize": [], "mentions": [], "quote_highlights": [], "people": {},
            "filler_obs": "", "patterns": "", "sanxing": {}}
     seen = set()
 
@@ -219,6 +226,16 @@ def merge_results(rs):
         for q in r.get("quote_highlights", []):
             if q and q not in out["quote_highlights"]:
                 out["quote_highlights"].append(q)
+        for pl in r.get("people", []):
+            nm = (pl.get("name") or "").strip()
+            if not nm or nm.startswith("说话人"):
+                continue
+            tgt = out["people"].setdefault(nm, {"viewpoint": [], "profile": [],
+                                               "attitude": [], "expectations": [], "facts": []})
+            for fld in tgt:
+                v = (pl.get(fld) or "").strip()
+                if v and v != "无" and v not in tgt[fld]:
+                    tgt[fld].append(v)
         for field in ("filler_obs", "patterns"):
             v = (r.get(field) or "").strip()
             if v:

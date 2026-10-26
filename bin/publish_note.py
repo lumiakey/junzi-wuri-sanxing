@@ -111,11 +111,34 @@ def render(today):
                     sanxing[k2].append(v2)
         cactions += r.get("contact_actions") or []
 
+    # 跨录音聚合对话者洞察(带真名标签的他人)
+    people = {}
+    for r in main:
+        for nm, pl in ((r.get("llm") or {}).get("people") or {}).items():
+            tgt = people.setdefault(nm, {"viewpoint": [], "profile": [],
+                                         "attitude": [], "expectations": [], "facts": []})
+            for fld in tgt:
+                for v in pl.get(fld, []):
+                    if v not in tgt[fld]:
+                        tgt[fld].append(v)
+
+    n_llm_ok = sum(1 for r in main if r.get("llm"))
     M = []
     M.append(f"# 三省 · {today}")
     M.append("")
-    M.append(f"> {len(recs)}段录音 · {n_dur // 60}分{n_dur % 60}秒语料 · {n_cjk}字 ｜ "
-             f"有效分析{len(main)}段" + (f"，另有{len(triv)}条短录音({triv_cjk}字)未达分析门槛" if triv else ""))
+    M.append("## 📌 今日速览")
+    M.append("")
+    M.append(f"- 录音 **{len(recs)}** 段 · {n_dur // 60}分{n_dur % 60}秒 · {n_cjk}字 ｜ 完整分析 {n_llm_ok} 段"
+             + (f" · 统计版 {len(main) - n_llm_ok} 段" if len(main) - n_llm_ok else "")
+             + (f" · 短录音 {len(triv)} 段" if triv else ""))
+    M.append(f"- 承诺 **{len(promises)}** 条"
+             + (f"（‼️重要 {sum(1 for p in promises if p.get('importance') == 'high')} 条）" if promises else "")
+             + f" ｜ 要记住 {len(memorize)} 条 ｜ 对话者 {len(people)} 人"
+             + ("" if people else "（待声纹认人后解锁画像）"))
+    if promises:
+        for p in promises[:3]:
+            imp = "‼️" if p.get("importance") == "high" else ""
+            M.append(f"- {imp}→ **{p.get('to', '?')}**：{p.get('quote', '')[:40]}…（{p.get('deadline_display', '无')}）")
     M.append("")
     M.append("## 📖 传不习乎 · 分析表达")
     M.append("")
@@ -156,6 +179,18 @@ def render(today):
         M.append("")
         for c in cactions:
             M.append(f"- {c}")
+    if people:
+        M.append("")
+        M.append("## 👥 对话者洞察")
+        M.append("")
+        for nm, pl in people.items():
+            M.append(f"### {nm}")
+            for fld, lab in (("profile", "画像"), ("viewpoint", "观点"),
+                             ("attitude", "与我的关系/态度"), ("expectations", "对我的期许"),
+                             ("facts", "关键事实")):
+                if pl.get(fld):
+                    M.append(f"- **{lab}**: {'；'.join(pl[fld][:3])}")
+            M.append("")
     M.append("")
     M.append("## 🪞 吾日三省 · 自省报告")
     M.append("")
@@ -180,7 +215,8 @@ def render(today):
         tail = [t for t in open(COMMIT, encoding="utf-8").read().splitlines()[-15:] if t.strip()]
     body = []
     body.append(f"<h1>三省 · {today}</h1>")
-    body.append("<p>" + inline(M[2].lstrip("> ")) + "</p>")
+    overview = M[M.index("## 📌 今日速览"):M.index("## 📖 传不习乎 · 分析表达")]
+    body.append(html_of_md_lines(overview))
     body.append("<hr>")
     sec1 = M[M.index("## 📖 传不习乎 · 分析表达"):M.index("## 🤝 与朋友交而不信乎 · 承诺记录")]
     sec2 = M[M.index("## 🤝 与朋友交而不信乎 · 承诺记录"):M.index("## 🪞 吾日三省 · 自省报告")]

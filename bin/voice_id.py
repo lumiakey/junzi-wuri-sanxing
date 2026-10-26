@@ -53,11 +53,8 @@ for a in asks:
     if r.returncode != 0 or not os.path.exists(cp) or os.path.getsize(cp) < 10000:
         print(f"{a['label']}: 截取音频失败, 跳过")
         continue
-    html = ('<div>🎤 这位在你录音里说了 ' + f"{a['dur']/60:.0f}" + ' 分钟, 听听是谁?</div>'
-            '<div>👇 点击下方音频播放</div>'
-            '<div><br></div>'
-            '<div>✏️ 听出来后, 把本笔记<b>标题末尾</b>的「改成名字」改成他的名字(如: 老X)</div>'
-            '<div>改完双击「立即处理」, 本笔记自动消失, 此后永久记住他</div>')
+    # 正文只留一行: 多行div会被宽音频卡片遮挡(Notes附件混排缺陷)
+    html = ('<div>🎤 说了' + f"{a['dur']/60:.0f}" + '分钟, 听听是谁? 把本笔记标题末尾的「改成名字」改成他的名字即可</div>')
     title = a["note"]
     ascript = f'''
 tell application "Notes"
