@@ -50,8 +50,9 @@ if [ "$VM_COUNT" -eq 0 ]; then
 fi
 
 NEW=0
-# 消化联系人线索: 读备忘录别名映射, 回填挂起的歧义待办(用户回答歧义的通道)
+# 消化联系人线索与声音认人回答(用户在备忘录里的答案)
 python3 "$ROOT/bin/resolve_mentions.py" || echo "线索消化异常(不影响后续)"
+python3 "$ROOT/bin/resolve_voices.py" || echo "声音认人消化异常(不影响后续)"
 
 # 声纹注册: inbox里出现命名为"声纹注册"的音频则更新注册样本(30-60秒本人真声)
 REG_SRC=$(ls "$INBOX" 2>/dev/null | grep -i "声纹注册" | head -1 || true)
@@ -84,7 +85,7 @@ while IFS= read -r f; do
 
   # 说话人分离(本地声纹): 成功则生成 .spk.txt 带说话人标签的转写; 失败则无标签继续
   if [ -x "$ROOT/venv/bin/python3" ] && [ -f "$ROOT/models/sherpa-onnx-pyannote-segmentation-3.0/model.int8.onnx" ]; then
-    "$ROOT/venv/bin/python3" "$ROOT/bin/diarize.py" "$WAV" "$OUTBASE.srt" 2>&1 | tail -3 || echo "分离失败(继续无标签分析)"
+    "$ROOT/venv/bin/python3" "$ROOT/bin/diarize.py" "$WAV" "$OUTBASE.srt" "" 3 0.70 "$STASH" 2>&1 | tail -3 || echo "分离失败(继续无标签分析)"
   else
     echo "未配置声纹分离环境(venv/模型), 无标签分析"
   fi
@@ -97,6 +98,9 @@ while IFS= read -r f; do
 done < "$TMP_LIST"
 
 echo "=== 完成: 本次新处理 $NEW 个录音 ==="
+
+# 声音认人: 对新的陌生说话人生成可试听的认人笔记
+python3 "$ROOT/bin/voice_id.py" || echo "声音认人生成异常(不影响其余)"
 
 # 发布今日报告到备忘录(三类: 传不习乎/与朋友交/吾日三省)
 python3 "$ROOT/bin/publish_note.py" || echo "备忘录发布失败(不影响其余结果)"
