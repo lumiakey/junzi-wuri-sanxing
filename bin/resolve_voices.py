@@ -7,7 +7,7 @@ import os, json, subprocess, datetime
 ROOT = os.path.expanduser("~/sanxing")
 LIB = os.path.join(ROOT, "data/state/声纹库.json")
 PENDING = os.path.join(ROOT, "data/state/pending_voices.json")
-PLACEHOLDER = {"改成名字", "填名字", "名字"}
+PLACEHOLDER = {"改成名字", "填名字", "名字", "听音频后把这里改成名字"}
 
 pending = json.load(open(PENDING, encoding="utf-8")) if os.path.exists(PENDING) else {}
 if not pending:

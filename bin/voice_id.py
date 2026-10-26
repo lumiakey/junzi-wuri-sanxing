@@ -53,9 +53,9 @@ for a in asks:
     if r.returncode != 0 or not os.path.exists(cp) or os.path.getsize(cp) < 10000:
         print(f"{a['label']}: 截取音频失败, 跳过")
         continue
-    # 正文只留一行: 多行div会被宽音频卡片遮挡(Notes附件混排缺陷)
-    html = ('<div>🎤 说了' + f"{a['dur']/60:.0f}" + '分钟, 听听是谁? 把本笔记标题末尾的「改成名字」改成他的名字即可</div>')
-    title = a["note"]
+    # Notes音频卡片是行内浮动元素, 正文任何文字都会被叠压 -> 正文留空, 指引全放标题
+    html = " "
+    title = a["note"].replace("改成名字", "听音频后把这里改成名字")
     ascript = f'''
 tell application "Notes"
 	if not (exists folder "三省") then make new folder with properties {{name:"三省"}}
