@@ -16,8 +16,8 @@ if not pending:
 
 lines = cl.read_confirm_note()
 if not lines:
-    print("确认笔记为空/不存在, 已重新渲染")
-    cl.render_confirm_note()
+    # 读取失败/索引延迟时不重渲染, 防止覆盖用户刚填的答案
+    print("确认笔记暂读不到(可能索引延迟或有{0}个待确认), 本次跳过, 不动笔记".format(len(pending)))
     raise SystemExit(0)
 
 answers = cl.parse_answers(lines, pending)

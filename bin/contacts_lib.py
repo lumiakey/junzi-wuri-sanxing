@@ -122,6 +122,8 @@ def add_pending(nick, fact=None, value=None, options=None):
 
 
 def render_confirm_note():
+    # Notes索引延迟会让upsert误判"不存在"再建一份 -> 渲染前先清光旧的同名笔记(此笔记无附件, 重建安全)
+    osascript("as_note_del.applescript", CONFIRM_NOTE)
     body = ['<h1>联系人确认</h1>',
             '<p>回答方式：把选中那一行开头的 <b>▢ 改成 ✅</b>；'
             '或直接在填空行写 <b>称呼=名字</b>。改完双击「立即处理」即生效。</p><hr>']
