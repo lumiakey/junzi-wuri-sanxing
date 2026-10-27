@@ -53,24 +53,24 @@ for a in asks:
     if r.returncode != 0 or not os.path.exists(cp) or os.path.getsize(cp) < 10000:
         print(f"{a['label']}: 截取音频失败, 跳过")
         continue
-    # 音频放iCloud Drive(文件App可听), 笔记纯文字结构化排版(附件渲染在此机器上不可靠)
-    import shutil
-    ICLOUD = os.path.expanduser("~/Library/Mobile Documents/com~apple~CloudDocs/三省声音认人")
-    os.makedirs(ICLOUD, exist_ok=True)
-    dst = os.path.join(ICLOUD, f"{a['label']}.m4a")
-    shutil.copyfile(cp, dst)
+    # 表格排版: 指引放原生表格(结构化块元素), 音频附件跟在表格后
     title = a["note"].replace("改成名字", "听后把这里改成名字")
-    html = ('<div>🎤 ' + a['label'] + ' · 在你录音里说了 ' + f"{a['dur']/60:.0f}" + ' 分钟</div>'
-            '<div><br></div>'
-            '<div><b>① 试听</b>: 打开 文件App(或Mac访达 iCloud Drive) → 三省声音认人 → '
-            + a['label'] + '.m4a</div>'
-            '<div><b>② 是谁</b>: 听出来后, 把本条笔记<b>标题末尾</b>的「听后把这里改成名字」改成他的名字</div>'
-            '<div><b>③ 生效</b>: 改完双击「立即处理」, 此笔记自动消失并永久记住此人</div>')
+    mins = f"{a['dur']/60:.0f}"
+    html = ('<table border="1">'
+            '<tr><td>🎤 ' + a['label'] + ' · 说了 ' + mins + ' 分钟</td></tr>'
+            '<tr><td>① 点下方 ▶ 播放音频</td></tr>'
+            '<tr><td>② 听出是谁后, 把本笔记标题末尾「听后把这里改成名字」改成他的名字</td></tr>'
+            '<tr><td>③ 双击「立即处理」生效, 本笔记自动消失</td></tr>'
+            '</table><div><br></div>')
     ascript = f'''
 tell application "Notes"
 	if not (exists folder "三省") then make new folder with properties {{name:"三省"}}
 	tell folder "三省"
-		make new note with properties {{name:"{title}", body:"{html}"}}
+		set n to make new note with properties {{name:"{title}", body:"{html}"}}
+		delay 1
+		tell n
+			make new attachment with data (POSIX file "{cp}" as alias)
+		end tell
 	end tell
 end tell'''
     r = subprocess.run(["osascript", "-e", ascript], capture_output=True, text=True)
