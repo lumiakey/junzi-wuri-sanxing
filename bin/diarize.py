@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """说话人分离 + whisper时间轴对齐 + 声纹库命名 + "我"认领
 用法: diarize.py <wav16k单声道> <转写srt> [注册wav] [人数=3] [阈值=0.70] [源音频路径]
-输出: <srt>.spk.txt        带标签转写 "[mm:ss] 我/人名/说话人X: 原文"
+输出: <srt>.spk.txt        带标签转写 "[mm:ss] 我/老唐/说话人X: 原文"
       <srt>.spk.meta.json  各说话人时长/片段/声纹(供声音认人与入库)
 依赖: ~/sanxing/venv (sherpa-onnx)"""
 import os, sys, wave, re, json
@@ -105,7 +105,7 @@ for k, e in embeds.items():
         print(f"  声纹库命中: 说话人{k} → {labels[k]} ({scored[0][0]:.3f})")
 
 # 声纹注册认领"我"(优先级高于库)
-if os.path.exists(ENROLL) and os.path.getsize(ENROLL) > 400000:
+if os.path.exists(ENROLL) and os.path.getsize(ENROLL) > 150000:  # >=5秒(认人片段约7-16秒)
     mine = embed_of(read_wav(ENROLL))
     if mine is not None:
         best_k, best_s = None, -1

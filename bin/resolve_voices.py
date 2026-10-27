@@ -35,18 +35,33 @@ for title in r.stdout.splitlines():
     answer = "·".join(parts[2:]).strip() if len(parts) >= 3 else ""
     if not answer or answer in PLACEHOLDER or answer == entry["label"]:
         continue
-    lib[answer] = entry["embedding"]
+    import glob as _g
+    if answer in ("自己", "我", "本人"):
+        # 用户标记"这是我自己" -> 写入声纹注册(认领'我:'标签), 不进人物库
+        clip = sorted(_g.glob(os.path.join(ROOT, "data/state/voice_clips",
+                                           entry["label"].replace("说话人", "spk") + "_*.m4a")))
+        if clip:
+            import subprocess as _sp
+            _sp.run(["/opt/homebrew/bin/ffmpeg", "-y", "-v", "error", "-i", clip[-1],
+                     "-ar", "16000", "-ac", "1", os.path.join(ROOT, "data/state/声纹注册.wav")],
+                    check=True)
+            print(f"✅ {entry['label']} = 我自己, 已写入声纹注册({os.path.basename(clip[-1])})")
+        else:
+            lib["我"] = entry["embedding"]
+            print(f"✅ {entry['label']} = 我自己(音频缺失, 以库内'我'标记)")
+    else:
+        lib[answer] = entry["embedding"]
+        print(f"✅ {entry['label']} = {answer}, 声纹已入库(说{entry['dur']/60:.0f}分钟的那位)")
     resolved.append((title, entry["label"], answer))
-    print(f"✅ {entry['label']} = {answer}, 声纹已入库(说{entry['dur']/60:.0f}分钟的那位)")
     subprocess.run(["osascript", "-e",
         f'tell application "Notes" to tell folder "三省" to delete (every note whose name is "{title}")'],
         capture_output=True, text=True)
 
 if resolved:
     json.dump(lib, open(LIB, "w", encoding="utf-8"), ensure_ascii=False)
-    done_prefixes = {(t.split(" · ")[0], t.split(" · ")[1]) for t, _, _ in resolved}
+    done_prefixes = {tuple(t.split(" · ")[:2]) for t, _, _ in resolved}
     pending = {k: v for k, v in pending.items()
-               if (v.get("note", "").split(" · ") + ["", ""])[0:2] not in done_prefixes}
+               if tuple(v.get("note", "").split(" · ")[:2]) not in done_prefixes}
     json.dump(pending, open(PENDING, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     with open(os.path.join(ROOT, "data/commitments/台账.md"), "a", encoding="utf-8") as f:
         today = datetime.date.today().isoformat()
