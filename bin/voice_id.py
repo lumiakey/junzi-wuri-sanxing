@@ -56,7 +56,7 @@ for a in asks:
     # 表格排版: 指引放原生表格(结构化块元素), 音频附件跟在表格后
     title = a["note"].replace("改成名字", "听后把这里改成名字")
     mins = f"{a['dur']/60:.0f}"
-    html = ('<table border="1">'
+    html = ("<table border='1'>"
             '<tr><td>🎤 ' + a['label'] + ' · 说了 ' + mins + ' 分钟</td></tr>'
             '<tr><td>① 点下方 ▶ 播放音频</td></tr>'
             '<tr><td>② 听出是谁后, 把本笔记标题末尾「听后把这里改成名字」改成他的名字</td></tr>'
